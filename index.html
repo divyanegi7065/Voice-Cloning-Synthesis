@@ -210,7 +210,7 @@
             font-size: 12px;
         }
 
-        textarea, select {
+        textarea, select, input[type="url"] {
             width: 100%;
             border: 1px solid #d0d5dd;
             border-radius: 10px;
@@ -244,13 +244,14 @@
 
         .voice-row {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: minmax(130px, 0.8fr) minmax(180px, 1.2fr) auto;
             align-items: end;
             gap: 10px;
             margin-top: 18px;
         }
 
-        select {
+        select, input[type="url"] {
+            width: 100%;
             min-height: 43px;
             padding: 0 12px;
         }
@@ -310,6 +311,10 @@
             margin-top: 22px;
             padding-top: 21px;
             border-top: 1px solid #f0f1f4;
+        }
+
+        .action-row [hidden] {
+            display: none;
         }
 
         .status {
@@ -383,11 +388,12 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            .voice-row .voice-select {
+            .voice-row .backend-select {
                 grid-column: 1 / -1;
             }
 
             .voice-row .button {
+                grid-column: 1 / -1;
                 width: 100%;
             }
         }
@@ -411,20 +417,20 @@
                 </span>
                 Voice Studio
             </a>
-            <span class="badge"><span class="badge-dot" aria-hidden="true"></span>Static web demo</span>
+            <span class="badge"><span class="badge-dot" aria-hidden="true"></span>XTTS voice cloning</span>
         </header>
 
         <section class="intro" aria-labelledby="page-title">
-            <p class="eyebrow">Text to speech preview</p>
+            <p class="eyebrow">AI voice generation</p>
             <h1 id="page-title">Bring your words to life.</h1>
-            <p class="intro-copy">Try a speech preview right in your browser. This GitHub Pages version is a static frontend and does not clone voices or upload your files.</p>
+            <p class="intro-copy">Upload an authorized voice sample, enter your text, and generate speech with the XTTS voice-cloning service.</p>
         </section>
 
-        <section class="card" aria-label="Speech preview">
+        <section class="card" aria-label="Voice cloning">
             <div class="field">
                 <div class="field-heading">
-                    <label for="referenceAudio">Reference audio</label>
-                    <span class="optional">Optional · stays on your device</span>
+                    <label for="referenceAudio">Your voice sample</label>
+                    <span class="optional">Required · WAV, MP3, OGG, FLAC or M4A</span>
                 </div>
                 <div class="upload">
                     <span class="upload-icon" aria-hidden="true">
@@ -434,51 +440,74 @@
                     </span>
                     <div class="upload-copy">
                         <strong id="fileName">No audio selected</strong>
-                        <span>Choose an audio file to play it back locally</span>
+                        <span>Select a clear sample of the voice you are authorized to use</span>
                     </div>
-                    <input id="referenceAudio" type="file" accept="audio/*" aria-label="Choose reference audio">
+                    <input id="referenceAudio" type="file" accept=".wav,.mp3,.ogg,.flac,.m4a,audio/wav,audio/mpeg,audio/ogg,audio/flac,audio/mp4" aria-label="Choose reference audio">
                 </div>
                 <audio id="samplePlayer" class="sample-player" controls aria-label="Play selected reference audio"></audio>
             </div>
 
             <div class="field">
                 <div class="field-heading">
-                    <label for="speechText">Text to speak</label>
+                    <label for="speechText">Text to generate</label>
                     <span class="optional">Required</span>
                 </div>
                 <textarea id="speechText" maxlength="1000" placeholder="Type something you would like to hear..." aria-describedby="textHelp"></textarea>
                 <div class="text-footer">
-                    <span id="textHelp" class="helper">Your text is processed by your browser's speech engine.</span>
+                    <span id="textHelp" class="helper">XTTS generates new audio conditioned on your sample.</span>
                     <span class="counter"><span id="charCount">0</span>/1000</span>
                 </div>
             </div>
 
             <div class="voice-row">
-                <div class="voice-select">
+                <div class="language-select">
                     <div class="field-heading">
-                        <label for="voiceSelect">Browser voice</label>
+                        <label for="languageSelect">Speech language</label>
                     </div>
-                    <select id="voiceSelect" aria-label="Choose a browser speech voice"></select>
+                    <select id="languageSelect" aria-label="Choose the language for generated speech">
+                        <option value="en" selected>English</option>
+                        <option value="ar">Arabic</option>
+                        <option value="cs">Czech</option>
+                        <option value="de">German</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="hi">Hindi</option>
+                        <option value="hu">Hungarian</option>
+                        <option value="it">Italian</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="nl">Dutch</option>
+                        <option value="pl">Polish</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
+                        <option value="tr">Turkish</option>
+                        <option value="zh-cn">Chinese</option>
+                    </select>
                 </div>
-                <button id="speakButton" class="button button-primary" type="button">
+                <div class="backend-select">
+                    <div class="field-heading">
+                        <label for="backendUrl">XTTS service URL</label>
+                    </div>
+                    <input id="backendUrl" type="url" value="http://localhost:8000" placeholder="https://your-xtts-service.example.com" aria-label="XTTS backend URL">
+                </div>
+                <button id="generateButton" class="button button-primary" type="button">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M5 10v4m4-8v12m4-15v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
-                    Preview speech
-                </button>
-                <button id="stopButton" class="button button-secondary" type="button" disabled>
-                    Stop
+                    Generate cloned speech
                 </button>
             </div>
 
             <div class="action-row">
                 <button id="clearButton" class="button button-secondary" type="button">Clear text</button>
+                <a id="downloadButton" class="button button-secondary" hidden download="cloned_voice.wav">Download audio</a>
             </div>
+            <audio id="generatedPlayer" class="sample-player" controls aria-label="Generated cloned speech"></audio>
             <p id="status" class="status" role="status" aria-live="polite"></p>
         </section>
 
         <footer>
-            Browser speech availability and voices vary by device. For actual XTTS voice cloning, the FastAPI service must be hosted separately.
+            GitHub Pages hosts this interface only. Run the FastAPI XTTS service or enter its publicly reachable URL above.
             <br>
             <a href="https://github.com/divyanegi7065/Voice-Cloning-Synthesis">View the project on GitHub</a>
         </footer>
@@ -490,41 +519,31 @@
         const samplePlayer = document.getElementById('samplePlayer');
         const speechText = document.getElementById('speechText');
         const charCount = document.getElementById('charCount');
-        const voiceSelect = document.getElementById('voiceSelect');
-        const speakButton = document.getElementById('speakButton');
-        const stopButton = document.getElementById('stopButton');
+        const languageSelect = document.getElementById('languageSelect');
+        const backendUrl = document.getElementById('backendUrl');
+        const generateButton = document.getElementById('generateButton');
         const clearButton = document.getElementById('clearButton');
+        const generatedPlayer = document.getElementById('generatedPlayer');
+        const downloadButton = document.getElementById('downloadButton');
         const status = document.getElementById('status');
         let sampleUrl = null;
-        let availableVoices = [];
+        let generatedUrl = null;
 
         function setStatus(message, kind = '') {
             status.textContent = message;
             status.dataset.kind = kind;
         }
 
-        function loadVoices() {
-            const selectedVoiceName = voiceSelect.value;
-            availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-            voiceSelect.replaceChildren();
-
-            if (availableVoices.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Default browser voice';
-                voiceSelect.append(option);
-                return;
+        function clearGeneratedAudio() {
+            generatedPlayer.pause();
+            generatedPlayer.removeAttribute('src');
+            generatedPlayer.classList.remove('visible');
+            downloadButton.removeAttribute('href');
+            downloadButton.hidden = true;
+            if (generatedUrl) {
+                URL.revokeObjectURL(generatedUrl);
+                generatedUrl = null;
             }
-
-            availableVoices.forEach((voice, index) => {
-                const option = document.createElement('option');
-                option.value = String(index);
-                option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' · Default' : ''}`;
-                voiceSelect.append(option);
-                if (voice.name === selectedVoiceName) {
-                    option.selected = true;
-                }
-            });
         }
 
         audioInput.addEventListener('change', () => {
@@ -532,6 +551,7 @@
                 URL.revokeObjectURL(sampleUrl);
                 sampleUrl = null;
             }
+            clearGeneratedAudio();
 
             const file = audioInput.files[0];
             samplePlayer.pause();
@@ -544,10 +564,22 @@
                 return;
             }
 
-            if (!file.type.startsWith('audio/')) {
+            if (!/\.(wav|mp3|ogg|flac|m4a)$/i.test(file.name)) {
                 audioInput.value = '';
                 fileName.textContent = 'No audio selected';
-                setStatus('Please choose a supported audio file.', 'error');
+                setStatus('Please choose a WAV, MP3, OGG, FLAC, or M4A audio file.', 'error');
+                return;
+            }
+            if (file.size > 25 * 1024 * 1024) {
+                audioInput.value = '';
+                fileName.textContent = 'No audio selected';
+                setStatus('The audio sample must be 25 MB or smaller.', 'error');
+                return;
+            }
+            if (!file.size) {
+                audioInput.value = '';
+                fileName.textContent = 'No audio selected';
+                setStatus('The selected audio file is empty.', 'error');
                 return;
             }
 
@@ -555,59 +587,81 @@
             samplePlayer.src = sampleUrl;
             samplePlayer.classList.add('visible');
             fileName.textContent = file.name;
-            setStatus('Audio is ready for local playback. It is not used for voice cloning.', 'success');
+            setStatus('Voice sample selected and ready for generation.', 'success');
         });
 
         speechText.addEventListener('input', () => {
             charCount.textContent = String(speechText.value.length);
         });
 
-        speakButton.addEventListener('click', () => {
+        generateButton.addEventListener('click', async () => {
             const text = speechText.value.trim();
             if (!text) {
-                setStatus('Enter some text before starting the preview.', 'error');
+                setStatus('Enter the text you want the cloned voice to speak.', 'error');
                 speechText.focus();
                 return;
             }
 
-            if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-                setStatus('Speech preview is not supported by this browser. Try a recent version of Chrome, Edge, or Safari.', 'error');
+            const audioFile = audioInput.files[0];
+            if (!audioFile) {
+                setStatus('Select an authorized voice sample before generating speech.', 'error');
+                audioInput.focus();
                 return;
             }
 
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            const voiceIndex = Number(voiceSelect.value);
-            if (Number.isInteger(voiceIndex) && availableVoices[voiceIndex]) {
-                utterance.voice = availableVoices[voiceIndex];
+            let apiBase;
+            try {
+                const parsedUrl = new URL(backendUrl.value.trim());
+                if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+                    throw new Error('Use an HTTP or HTTPS URL.');
+                }
+                apiBase = parsedUrl.toString().replace(/\/+$/, '');
+            } catch {
+                setStatus('Enter a valid XTTS service URL.', 'error');
+                backendUrl.focus();
+                return;
             }
 
-            utterance.onstart = () => {
-                speakButton.disabled = true;
-                stopButton.disabled = false;
-                setStatus('Playing a standard browser voice preview. This is not a voice clone.');
-            };
-            utterance.onend = () => {
-                speakButton.disabled = false;
-                stopButton.disabled = true;
-                setStatus('Preview finished.', 'success');
-            };
-            utterance.onerror = (event) => {
-                speakButton.disabled = false;
-                stopButton.disabled = true;
-                if (event.error !== 'canceled' && event.error !== 'interrupted') {
-                    setStatus(`Could not play the preview: ${event.error}.`, 'error');
+            generateButton.disabled = true;
+            clearGeneratedAudio();
+            setStatus('Generating speech with XTTS using your voice sample. This may take a few minutes.');
+
+            const formData = new FormData();
+            formData.append('audio_file', audioFile);
+            formData.append('text', text);
+            formData.append('language', languageSelect.value);
+            try {
+                const response = await fetch(`${apiBase}/clone`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    let message = `Generation failed (HTTP ${response.status}).`;
+                    try {
+                        const errorData = await response.json();
+                        message = errorData.detail || message;
+                    } catch {
+                        // Keep the HTTP status message if the service did not return JSON.
+                    }
+                    throw new Error(message);
                 }
-            };
 
-            window.speechSynthesis.speak(utterance);
-        });
-
-        stopButton.addEventListener('click', () => {
-            window.speechSynthesis.cancel();
-            speakButton.disabled = false;
-            stopButton.disabled = true;
-            setStatus('Preview stopped.');
+                const audioBlob = await response.blob();
+                if (!audioBlob.type.startsWith('audio/')) {
+                    throw new Error('The service response was not an audio file.');
+                }
+                generatedUrl = URL.createObjectURL(audioBlob);
+                generatedPlayer.src = generatedUrl;
+                generatedPlayer.classList.add('visible');
+                downloadButton.href = generatedUrl;
+                downloadButton.hidden = false;
+                setStatus('Speech generated with your voice sample. Play or download the audio below.', 'success');
+            } catch (error) {
+                setStatus(error.message || 'Could not connect to the XTTS service. Check its URL and availability.', 'error');
+                console.error(error);
+            } finally {
+                generateButton.disabled = false;
+            }
         });
 
         clearButton.addEventListener('click', () => {
@@ -621,16 +675,10 @@
             if (sampleUrl) {
                 URL.revokeObjectURL(sampleUrl);
             }
+            if (generatedUrl) {
+                URL.revokeObjectURL(generatedUrl);
+            }
         });
-
-        if ('speechSynthesis' in window) {
-            loadVoices();
-            window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
-        } else {
-            loadVoices();
-            speakButton.disabled = true;
-            setStatus('This browser does not support speech preview. You can still play a selected audio sample.', 'error');
-        }
     </script>
 </body>
 </html>
