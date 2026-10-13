@@ -2,146 +2,673 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Custom Voice Cloner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>Voice Studio</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 20px;
+        :root {
+            color-scheme: light;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #182230;
+            background: #f6f7fb;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            --muted: #667085;
+            --border: #e4e7ec;
+            --accent: #6750d8;
+            --accent-dark: #523bc2;
         }
 
-        form {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        button, select, textarea, input {
+            font: inherit;
+        }
+
+        .page {
+            width: min(100% - 32px, 980px);
+            margin: 0 auto;
+            padding: 38px 0 48px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 42px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: inherit;
+            font-size: 18px;
+            font-weight: 750;
+            letter-spacing: -0.04em;
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border-radius: 12px;
+            background: #eeeaff;
+            color: var(--accent);
+        }
+
+        .brand-mark svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: #fff;
+            color: #475467;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #12b76a;
+        }
+
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            margin: 0 0 12px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(34px, 6vw, 52px);
+            letter-spacing: -0.055em;
+            line-height: 1.08;
+        }
+
+        .intro-copy {
+            margin: 16px auto 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        .notice {
+            display: flex;
+            gap: 12px;
+            max-width: 740px;
+            margin: 0 auto 22px;
+            padding: 15px 17px;
+            border: 1px solid #e1dcff;
+            border-radius: 14px;
+            background: #f1efff;
+            color: #43358f;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .notice svg {
+            flex: 0 0 19px;
+            width: 19px;
+            height: 19px;
+            margin-top: 1px;
+        }
+
+        .notice strong {
             display: block;
+            margin-bottom: 2px;
+            color: #352875;
+        }
+
+        .card {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: clamp(20px, 5vw, 34px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 18px 50px rgb(16 24 40 / 6%);
+        }
+
+        .field + .field {
+            margin-top: 25px;
+        }
+
+        .field-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 9px;
+        }
+
+        label, .field-label {
+            color: #344054;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .optional, .helper, .counter {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .upload {
+            display: flex;
+            min-height: 82px;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 16px;
+            border: 1px dashed #c9c3ec;
+            border-radius: 12px;
+            background: #fcfbff;
+        }
+
+        .upload-icon {
+            display: grid;
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            place-items: center;
+            border-radius: 11px;
+            background: #eeeaff;
+            color: var(--accent);
+        }
+
+        .upload-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .upload-copy {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .upload-copy strong {
+            display: block;
+            overflow: hidden;
+            color: #344054;
+            font-size: 13px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .upload-copy span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .upload input {
+            width: min(190px, 42%);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        textarea, select {
+            width: 100%;
+            border: 1px solid #d0d5dd;
+            border-radius: 10px;
+            background: #fff;
+            color: #182230;
+            outline: none;
         }
 
         textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
+            min-height: 145px;
+            padding: 13px 14px;
+            resize: vertical;
+            line-height: 1.55;
         }
 
-        input, button {
-            margin-top: 10px;
-            font-size: 16px;
+        textarea::placeholder {
+            color: #98a2b3;
         }
 
-        input[type="file"], input[type="text"] {
-            width: 100%;
-            box-sizing: border-box;
+        textarea:focus, select:focus {
+            border-color: #9b8bea;
+            box-shadow: 0 0 0 3px rgb(103 80 216 / 13%);
         }
 
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .text-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 7px;
+        }
+
+        .voice-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        select {
+            min-height: 43px;
+            padding: 0 12px;
+        }
+
+        .button {
+            display: inline-flex;
+            min-height: 43px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 10px;
             cursor: pointer;
-            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background-color 120ms ease, transform 120ms ease;
         }
 
-        button:hover {
-            background-color: #218838;
+        .button:hover:not(:disabled) {
+            transform: translateY(-1px);
         }
 
-        button:disabled {
-            opacity: 0.7;
+        .button:disabled {
             cursor: not-allowed;
+            opacity: 0.55;
         }
 
-        audio {
-            margin-top: 20px;
+        .button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .button-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .button-primary:hover:not(:disabled) {
+            background: var(--accent-dark);
+        }
+
+        .button-secondary {
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #344054;
+        }
+
+        .button-secondary:hover:not(:disabled) {
+            background: #f9fafb;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+            padding-top: 21px;
+            border-top: 1px solid #f0f1f4;
+        }
+
+        .status {
+            min-height: 20px;
+            margin: 14px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .status[data-kind="error"] {
+            color: #b42318;
+        }
+
+        .status[data-kind="success"] {
+            color: #027a48;
+        }
+
+        .sample-player {
+            display: none;
             width: 100%;
+            height: 36px;
+            margin-top: 12px;
+        }
+
+        .sample-player.visible {
+            display: block;
+        }
+
+        footer {
+            max-width: 740px;
+            margin: 20px auto 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent);
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding-top: 22px;
+            }
+
+            header {
+                margin-bottom: 34px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .badge {
+                padding: 7px 9px;
+                font-size: 11px;
+            }
+
+            .upload {
+                flex-wrap: wrap;
+            }
+
+            .upload input {
+                width: 100%;
+                margin-left: 53px;
+            }
+
+            .voice-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .voice-row .voice-select {
+                grid-column: 1 / -1;
+            }
+
+            .voice-row .button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <h2>Local AI Voice Cloner</h2>
+    <main class="page">
+        <header>
+            <a class="brand" href="./" aria-label="Voice Studio home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M4 10v4m4-8v12m4-16v20m4-15v10m4-7v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                Voice Studio
+            </a>
+            <span class="badge"><span class="badge-dot" aria-hidden="true"></span>Static web demo</span>
+        </header>
 
-    <form id="cloningForm" method="post" enctype="multipart/form-data">
-        <h3>Reference Voice</h3>
-        <label for="audioFile">Upload File:</label>
-        <input id="audioFile" type="file" name="audio_file" accept=".wav,.mp3,.ogg,.flac,.m4a">
-        <br><br>
+        <section class="intro" aria-labelledby="page-title">
+            <p class="eyebrow">Text to speech preview</p>
+            <h1 id="page-title">Bring your words to life.</h1>
+            <p class="intro-copy">Try a speech preview right in your browser. This GitHub Pages version is a static frontend and does not clone voices or upload your files.</p>
+        </section>
 
-        <label for="audioUrl">OR Paste Audio Link (URL):</label>
-        <input id="audioUrl" type="text" name="audio_url" placeholder="https://example.com/voice.ogg" style="width: 100%;">
-        <br><br>
+        <aside class="notice" aria-label="Important information">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 11v5m0-8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div>
+                <strong>Voice cloning is not available on GitHub Pages alone.</strong>
+                The preview uses a standard voice provided by your browser. The reference audio stays on your device and is only available to play back here; it is not used to create a clone.
+            </div>
+        </aside>
 
-        <label for="textInput">Text to Speak:</label><br>
-        <textarea id="textInput" name="text" placeholder="Type the sentence you want the voice to say..."></textarea>
-        <br><br>
+        <section class="card" aria-label="Speech preview">
+            <div class="field">
+                <div class="field-heading">
+                    <label for="referenceAudio">Reference audio</label>
+                    <span class="optional">Optional · stays on your device</span>
+                </div>
+                <div class="upload">
+                    <span class="upload-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 15V4m0 0L8 8m4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <div class="upload-copy">
+                        <strong id="fileName">No audio selected</strong>
+                        <span>Choose an audio file to play it back locally</span>
+                    </div>
+                    <input id="referenceAudio" type="file" accept="audio/*" aria-label="Choose reference audio">
+                </div>
+                <audio id="samplePlayer" class="sample-player" controls aria-label="Play selected reference audio"></audio>
+            </div>
 
-        <button id="submitBtn" type="submit">Generate Voice</button>
-    </form>
+            <div class="field">
+                <div class="field-heading">
+                    <label for="speechText">Text to speak</label>
+                    <span class="optional">Required</span>
+                </div>
+                <textarea id="speechText" maxlength="1000" placeholder="Type something you would like to hear..." aria-describedby="textHelp"></textarea>
+                <div class="text-footer">
+                    <span id="textHelp" class="helper">Your text is processed by your browser's speech engine.</span>
+                    <span class="counter"><span id="charCount">0</span>/1000</span>
+                </div>
+            </div>
 
-    <h3 id="status" style="color: blue;"></h3>
+            <div class="voice-row">
+                <div class="voice-select">
+                    <div class="field-heading">
+                        <label for="voiceSelect">Browser voice</label>
+                    </div>
+                    <select id="voiceSelect" aria-label="Choose a browser speech voice"></select>
+                </div>
+                <button id="speakButton" class="button button-primary" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 10v4m4-8v12m4-15v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Preview speech
+                </button>
+                <button id="stopButton" class="button button-secondary" type="button" disabled>
+                    Stop
+                </button>
+            </div>
 
-    <h3>Result Audio:</h3>
-    <audio id="audioResult" controls></audio>
+            <div class="action-row">
+                <button id="clearButton" class="button button-secondary" type="button">Clear text</button>
+            </div>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+        </section>
+
+        <footer>
+            Browser speech availability and voices vary by device. For actual XTTS voice cloning, the FastAPI service must be hosted separately.
+            <br>
+            <a href="https://github.com/divyanegi7065/Voice-Cloning-Synthesis">View the project on GitHub</a>
+        </footer>
+    </main>
 
     <script>
-        const form = document.getElementById('cloningForm');
-        const textInput = document.getElementById('textInput');
-        const audioFileInput = document.getElementById('audioFile');
-        const audioUrlInput = document.getElementById('audioUrl');
-        const statusText = document.getElementById('status');
-        const submitBtn = document.getElementById('submitBtn');
-        const audioResult = document.getElementById('audioResult');
+        const audioInput = document.getElementById('referenceAudio');
+        const fileName = document.getElementById('fileName');
+        const samplePlayer = document.getElementById('samplePlayer');
+        const speechText = document.getElementById('speechText');
+        const charCount = document.getElementById('charCount');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const speakButton = document.getElementById('speakButton');
+        const stopButton = document.getElementById('stopButton');
+        const clearButton = document.getElementById('clearButton');
+        const status = document.getElementById('status');
+        let sampleUrl = null;
+        let availableVoices = [];
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+        function setStatus(message, kind = '') {
+            status.textContent = message;
+            status.dataset.kind = kind;
+        }
 
-            const text = textInput.value.trim();
-            const audioFile = audioFileInput.files[0];
-            const audioUrl = audioUrlInput.value.trim();
+        function loadVoices() {
+            const selectedVoiceName = voiceSelect.value;
+            availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+            voiceSelect.replaceChildren();
 
-            if (!text) {
-                alert('Please enter text to speak.');
+            if (availableVoices.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Default browser voice';
+                voiceSelect.append(option);
                 return;
             }
 
-            if (!audioFile && !audioUrl) {
-                alert('Please upload an audio file or paste an audio URL.');
-                return;
-            }
-
-            statusText.innerText = 'Processing... Generating clone (this may take a few seconds)...';
-            submitBtn.disabled = true;
-
-            const formData = new FormData();
-            formData.append('text', text);
-            if (audioFile) {
-                formData.append('audio_file', audioFile);
-            }
-            if (audioUrl) {
-                formData.append('audio_url', audioUrl);
-            }
-
-            try {
-                const response = await fetch('/clone', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: 'Generation failed.' }));
-                    throw new Error(errorData.detail || 'Generation failed.');
+            availableVoices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = String(index);
+                option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' · Default' : ''}`;
+                voiceSelect.append(option);
+                if (voice.name === selectedVoiceName) {
+                    option.selected = true;
                 }
+            });
+        }
 
-                const blob = await response.blob();
-                const audioUrlObject = URL.createObjectURL(blob);
-                audioResult.src = audioUrlObject;
-                statusText.innerText = 'Success! Listen to your cloned audio below:';
-            } catch (error) {
-                statusText.innerText = error.message || 'An error occurred while generating the voice.';
-                console.error(error);
-            } finally {
-                submitBtn.disabled = false;
+        audioInput.addEventListener('change', () => {
+            if (sampleUrl) {
+                URL.revokeObjectURL(sampleUrl);
+                sampleUrl = null;
+            }
+
+            const file = audioInput.files[0];
+            samplePlayer.pause();
+            samplePlayer.removeAttribute('src');
+            samplePlayer.classList.remove('visible');
+
+            if (!file) {
+                fileName.textContent = 'No audio selected';
+                setStatus('');
+                return;
+            }
+
+            if (!file.type.startsWith('audio/')) {
+                audioInput.value = '';
+                fileName.textContent = 'No audio selected';
+                setStatus('Please choose a supported audio file.', 'error');
+                return;
+            }
+
+            sampleUrl = URL.createObjectURL(file);
+            samplePlayer.src = sampleUrl;
+            samplePlayer.classList.add('visible');
+            fileName.textContent = file.name;
+            setStatus('Audio is ready for local playback. It is not used for voice cloning.', 'success');
+        });
+
+        speechText.addEventListener('input', () => {
+            charCount.textContent = String(speechText.value.length);
+        });
+
+        speakButton.addEventListener('click', () => {
+            const text = speechText.value.trim();
+            if (!text) {
+                setStatus('Enter some text before starting the preview.', 'error');
+                speechText.focus();
+                return;
+            }
+
+            if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+                setStatus('Speech preview is not supported by this browser. Try a recent version of Chrome, Edge, or Safari.', 'error');
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voiceIndex = Number(voiceSelect.value);
+            if (Number.isInteger(voiceIndex) && availableVoices[voiceIndex]) {
+                utterance.voice = availableVoices[voiceIndex];
+            }
+
+            utterance.onstart = () => {
+                speakButton.disabled = true;
+                stopButton.disabled = false;
+                setStatus('Playing a standard browser voice preview. This is not a voice clone.');
+            };
+            utterance.onend = () => {
+                speakButton.disabled = false;
+                stopButton.disabled = true;
+                setStatus('Preview finished.', 'success');
+            };
+            utterance.onerror = (event) => {
+                speakButton.disabled = false;
+                stopButton.disabled = true;
+                if (event.error !== 'canceled' && event.error !== 'interrupted') {
+                    setStatus(`Could not play the preview: ${event.error}.`, 'error');
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        });
+
+        stopButton.addEventListener('click', () => {
+            window.speechSynthesis.cancel();
+            speakButton.disabled = false;
+            stopButton.disabled = true;
+            setStatus('Preview stopped.');
+        });
+
+        clearButton.addEventListener('click', () => {
+            speechText.value = '';
+            charCount.textContent = '0';
+            setStatus('');
+            speechText.focus();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (sampleUrl) {
+                URL.revokeObjectURL(sampleUrl);
             }
         });
+
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+        } else {
+            loadVoices();
+            speakButton.disabled = true;
+            setStatus('This browser does not support speech preview. You can still play a selected audio sample.', 'error');
+        }
     </script>
 </body>
 </html>
