@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Custom Voice Cloner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        form {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input, button {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        input[type="file"], input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        audio {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h2>Local AI Voice Cloner</h2>
+
+    <form id="cloningForm" method="post" enctype="multipart/form-data">
+        <h3>Reference Voice</h3>
+        <label for="audioFile">Upload File:</label>
+        <input id="audioFile" type="file" name="audio_file" accept=".wav,.mp3,.ogg,.flac,.m4a">
+        <br><br>
+
+        <label for="audioUrl">OR Paste Audio Link (URL):</label>
+        <input id="audioUrl" type="text" name="audio_url" placeholder="https://example.com/voice.ogg" style="width: 100%;">
+        <br><br>
+
+        <label for="textInput">Text to Speak:</label><br>
+        <textarea id="textInput" name="text" placeholder="Type the sentence you want the voice to say..."></textarea>
+        <br><br>
+
+        <button id="submitBtn" type="submit">Generate Voice</button>
+    </form>
+
+    <h3 id="status" style="color: blue;"></h3>
+
+    <h3>Result Audio:</h3>
+    <audio id="audioResult" controls></audio>
+
+    <script>
+        const form = document.getElementById('cloningForm');
+        const textInput = document.getElementById('textInput');
+        const audioFileInput = document.getElementById('audioFile');
+        const audioUrlInput = document.getElementById('audioUrl');
+        const statusText = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+        const audioResult = document.getElementById('audioResult');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const text = textInput.value.trim();
+            const audioFile = audioFileInput.files[0];
+            const audioUrl = audioUrlInput.value.trim();
+
+            if (!text) {
+                alert('Please enter text to speak.');
+                return;
+            }
+
+            if (!audioFile && !audioUrl) {
+                alert('Please upload an audio file or paste an audio URL.');
+                return;
+            }
+
+            statusText.innerText = 'Processing... Generating clone (this may take a few seconds)...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('text', text);
+            if (audioFile) {
+                formData.append('audio_file', audioFile);
+            }
+            if (audioUrl) {
+                formData.append('audio_url', audioUrl);
+            }
+
+            try {
+                const response = await fetch('/clone', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Generation failed.' }));
+                    throw new Error(errorData.detail || 'Generation failed.');
+                }
+
+                const blob = await response.blob();
+                const audioUrlObject = URL.createObjectURL(blob);
+                audioResult.src = audioUrlObject;
+                statusText.innerText = 'Success! Listen to your cloned audio below:';
+            } catch (error) {
+                statusText.innerText = error.message || 'An error occurred while generating the voice.';
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
