@@ -15,6 +15,6 @@ Open `http://localhost:8000/` to use the app locally. The service loads the XTTS
 
 ## GitHub Pages
 
-GitHub Pages can host the static interface, but it cannot run the Python model. To use the published page, deploy this FastAPI service to a host with sufficient memory, then enter its HTTPS URL in the **XTTS service URL** field. The service allows requests from this project's GitHub Pages origin. Do not expose a development server directly to the public internet.
+GitHub Pages can host the static interface, but it cannot run the Python model. To enable the published page, deploy this FastAPI service to a host with sufficient memory and set the deployed service's HTTPS URL in the `xtts-api-url` meta tag at the top of `index.html`. The service allows requests from this project's GitHub Pages origin. Do not expose a development server directly to the public internet. Until that backend is deployed and configured, the page will clearly report that generation is unavailable instead of trying `localhost` on a visitor's computer.
 
 GitHub Pages source: branch `main`, folder `/(root)`.

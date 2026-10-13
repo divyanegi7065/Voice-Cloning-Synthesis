@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f6f7fb">
+    <meta name="xtts-api-url" content="">
     <title>Voice Studio</title>
     <style>
         :root {
@@ -244,7 +245,7 @@
 
         .voice-row {
             display: grid;
-            grid-template-columns: minmax(130px, 0.8fr) minmax(180px, 1.2fr) auto;
+            grid-template-columns: minmax(150px, 0.7fr) minmax(210px, 1fr);
             align-items: end;
             gap: 10px;
             margin-top: 18px;
@@ -388,10 +389,6 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            .voice-row .backend-select {
-                grid-column: 1 / -1;
-            }
-
             .voice-row .button {
                 grid-column: 1 / -1;
                 width: 100%;
@@ -484,12 +481,6 @@
                         <option value="zh-cn">Chinese</option>
                     </select>
                 </div>
-                <div class="backend-select">
-                    <div class="field-heading">
-                        <label for="backendUrl">XTTS service URL</label>
-                    </div>
-                    <input id="backendUrl" type="url" value="http://localhost:8000" placeholder="https://your-xtts-service.example.com" aria-label="XTTS backend URL">
-                </div>
                 <button id="generateButton" class="button button-primary" type="button">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M5 10v4m4-8v12m4-15v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -507,7 +498,7 @@
         </section>
 
         <footer>
-            GitHub Pages hosts this interface only. Run the FastAPI XTTS service or enter its publicly reachable URL above.
+            On GitHub Pages, speech generation requires the XTTS service to be deployed and configured. For local use, start the FastAPI service and open this page from that service.
             <br>
             <a href="https://github.com/divyanegi7065/Voice-Cloning-Synthesis">View the project on GitHub</a>
         </footer>
@@ -520,7 +511,7 @@
         const speechText = document.getElementById('speechText');
         const charCount = document.getElementById('charCount');
         const languageSelect = document.getElementById('languageSelect');
-        const backendUrl = document.getElementById('backendUrl');
+        const configuredApiUrl = document.querySelector('meta[name="xtts-api-url"]').content.trim();
         const generateButton = document.getElementById('generateButton');
         const clearButton = document.getElementById('clearButton');
         const generatedPlayer = document.getElementById('generatedPlayer');
@@ -609,16 +600,22 @@
                 return;
             }
 
-            let apiBase;
+            let apiBase = configuredApiUrl;
+            if (!apiBase && ['localhost', '127.0.0.1'].includes(location.hostname)) {
+                apiBase = location.origin;
+            }
+            if (!apiBase) {
+                setStatus('The voice-cloning service is not connected to this GitHub Pages site yet. The XTTS backend must be deployed first; localhost only refers to your own computer.', 'error');
+                return;
+            }
             try {
-                const parsedUrl = new URL(backendUrl.value.trim());
+                const parsedUrl = new URL(apiBase);
                 if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-                    throw new Error('Use an HTTP or HTTPS URL.');
+                    throw new Error('Unsupported service URL scheme.');
                 }
                 apiBase = parsedUrl.toString().replace(/\/+$/, '');
             } catch {
-                setStatus('Enter a valid XTTS service URL.', 'error');
-                backendUrl.focus();
+                setStatus('The configured XTTS service URL is invalid. Check the project configuration.', 'error');
                 return;
             }
 
@@ -657,7 +654,10 @@
                 downloadButton.hidden = false;
                 setStatus('Speech generated with your voice sample. Play or download the audio below.', 'success');
             } catch (error) {
-                setStatus(error.message || 'Could not connect to the XTTS service. Check its URL and availability.', 'error');
+                const message = error instanceof TypeError
+                    ? 'Could not reach the XTTS service. Check that it is running, publicly accessible over HTTPS, and allows requests from this Pages site.'
+                    : (error.message || 'XTTS speech generation failed.');
+                setStatus(message, 'error');
                 console.error(error);
             } finally {
                 generateButton.disabled = false;
